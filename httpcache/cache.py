@@ -52,4 +52,8 @@ class HTTPCache(object):
         immediately available, but it may be possible to re-use an old one,
         will attach an If-Modified-Since header to the request.
         """
-        pass
+        url = request.url
+
+        cached_response = self._cache.get(url, None)
+
+        return cached_response
