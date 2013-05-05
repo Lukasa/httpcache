@@ -58,15 +58,28 @@ class HTTPCache(object):
         # regardless of header value. Make sure that if we had an old cached
         # version we move the new one to the top of the cache.
         try:
-            del self._c[url]
+            del self._cache[url]
         except KeyError:
             pass
 
-        self._c[url] = {'response': response,
-                        'creation': creation,
-                        'expiry': None}
+        self._cache[url] = {'response': response,
+                            'creation': creation,
+                            'expiry': None}
 
         return True
+
+    def handle_304(self, response):
+        """
+        Given a 304 response, retrieves the cached entry. This unconditionally
+        returns the cached entry, so it can be used when the 'intelligent'
+        behaviour of retrieve() is not desired.
+        """
+        try:
+            cached_response = self._cache[response.url]['response']
+        except KeyError:
+            cached_response = None
+
+        return cached_response
 
     def retrieve(self, request):
         """
