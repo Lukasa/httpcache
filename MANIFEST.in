@@ -1,0 +1,1 @@
+include README.rst HISTORY.rst LICENSE test_httpcache.py test_requirements.txt
