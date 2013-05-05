@@ -34,3 +34,14 @@ def parse_date_header(header):
             dt = None
 
     return dt
+
+
+def build_date_header(dt):
+    """
+    Given a Python datetime object, build a Date header value according to
+    RFC 2616.
+
+    RFC 2616 specifies that the RFC 1123 form is to be preferred, so that is
+    what we use.
+    """
+    return dt.strftime(RFC_1123_DT_STR)
