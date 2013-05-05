@@ -26,10 +26,10 @@ def parse_date_header(header):
     'safe' behaviour.
     """
     try:
-        dt = datetime.strptime(RFC_1123_DT_STR, header)
+        dt = datetime.strptime(header, RFC_1123_DT_STR)
     except ValueError:
         try:
-            dt = datetime.strptime(RFC_850_DT_STR, header)
+            dt = datetime.strptime(header, RFC_850_DT_STR)
         except ValueError:
             dt = None
 
