@@ -64,6 +64,17 @@ class TestHTTPCache(object):
 
         assert req.headers['If-Modified-Since'] == 'Sun, 06 Nov 1994 08:49:37 GMT'
 
+    def test_we_respect_the_expires_header(self):
+        resp = MockRequestsResponse(headers={'Date': 'Sun, 06 Nov 1994 08:49:37 GMT',
+                                             'Expires': 'Sun, 06 Nov 2034 08:49:37 GMT'})
+        cache = httpcache.HTTPCache()
+        req = MockRequestsPreparedRequest()
+
+        cache.store(resp)
+        cached_resp = cache.retrieve(req)
+
+        assert cached_resp is resp
+
 
 class MockRequestsResponse(object):
     """
