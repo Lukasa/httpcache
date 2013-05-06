@@ -6,7 +6,7 @@ test-httpcache.py
 Test cases for httpcache.
 """
 import httpcache
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class TestHTTPCache(object):
@@ -74,6 +74,33 @@ class TestHTTPCache(object):
         cached_resp = cache.retrieve(req)
 
         assert cached_resp is resp
+
+    def test_expires_headers_invalidate(self):
+        resp1 = MockRequestsResponse(headers={'Date': 'Sun, 06 Nov 1994 08:49:37 GMT',
+                                              'Expires': 'Sun, 06 Nov 1994 08:49:37 GMT'})
+        resp2 = MockRequestsResponse(headers={'Date': 'Sun, 06 Nov 1994 08:49:37 GMT',
+                                              'Expires': 'Sun, 06 Nov 1994 08:00:00 GMT'})
+        cache = httpcache.HTTPCache()
+
+        assert not cache.store(resp1)
+        assert not cache.store(resp2)
+
+    def test_expiry_of_expires(self):
+        resp = MockRequestsResponse(headers={'Date': 'Sun, 06 Nov 1994 08:49:37 GMT',
+                                             'Expires': 'Sun, 04 Nov 2012 08:49:37 GMT'})
+        cache = httpcache.HTTPCache()
+        req = MockRequestsPreparedRequest()
+        earlier = timedelta(seconds=-60)
+        much_earlier = timedelta(days=-1)
+
+        cache._cache[resp.url] = {'response': resp,
+                                  'creation': datetime.utcnow() + much_earlier,
+                                  'expiry': datetime.utcnow() + earlier}
+
+        cached_resp = cache.retrieve(req)
+
+        assert cached_resp is None
+        assert len(cache._cache) == 0
 
 
 class MockRequestsResponse(object):
