@@ -12,7 +12,8 @@ except ImportError:
     # later.
     pass
 
-from .utils import parse_date_header, build_date_header
+from .utils import (parse_date_header, build_date_header,
+                    expires_from_cache_control)
 from datetime import datetime
 
 
@@ -55,13 +56,26 @@ class HTTPCache(object):
             return False
 
         url = response.url
+        now = datetime.utcnow()
 
         # Get the value of the 'Date' header, if it exists. If it doesn't, just
         # use now.
-        creation = date_header_or_default('Date', datetime.utcnow(), response)
+        creation = date_header_or_default('Date', now, response)
 
-        # Get the value of the 'Expires' header, if it exists.
-        expiry = date_header_or_default('Expires', None, response)
+        # Get the value of the 'Cache-Control' header, if it exists.
+        cc = response.headers.get('Cache-Control', None)
+        if cc is not None:
+            expiry = expires_from_cache_control(cc, now)
+
+            # If the above returns None, we are explicitly instructed not to
+            # cache this.
+            if expiry is None:
+                return False
+
+        # Get the value of the 'Expires' header, if it exists, and if we don't
+        # have anything from the 'Cache-Control' header.
+        if cc is None:
+            expiry = date_header_or_default('Expires', None, response)
 
         # If the expiry date is earlier or the same as the Date header, don't
         # cache the response at all.

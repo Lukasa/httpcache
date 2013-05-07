@@ -102,6 +102,33 @@ class TestHTTPCache(object):
         assert cached_resp is None
         assert len(cache._cache) == 0
 
+    def test_we_respect_cache_control_max_age(self):
+        resp = MockRequestsResponse(headers={'Cache-Control': 'max-age=3600'})
+        cache = httpcache.HTTPCache()
+        req = MockRequestsPreparedRequest()
+        assert cache.store(resp)
+
+        cached_resp = cache.retrieve(req)
+        assert cached_resp is resp
+
+    def test_we_respect_no_cache(self):
+        resp = MockRequestsResponse(headers={'Cache-Control': 'no-cache'})
+        cache = httpcache.HTTPCache()
+
+        assert not cache.store(resp)
+
+    def test_we_respect_no_store(self):
+        resp = MockRequestsResponse(headers={'Cache-Control': 'no-store'})
+        cache = httpcache.HTTPCache()
+
+        assert not cache.store(resp)
+
+    def test_we_respect_max_age_zero(self):
+        resp = MockRequestsResponse(headers={'Cache-Control': 'max-age=0'})
+        cache = httpcache.HTTPCache()
+
+        assert not cache.store(resp)
+
 
 class MockRequestsResponse(object):
     """

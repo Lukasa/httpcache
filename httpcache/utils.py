@@ -5,7 +5,7 @@ utils.py
 
 Utility functions for use with httpcache.
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 
 RFC_1123_DT_STR = "%a, %d %b %Y %H:%M:%S GMT"
 RFC_850_DT_STR = "%A, %d-%b-%y %H:%M:%S GMT"
@@ -45,3 +45,36 @@ def build_date_header(dt):
     what we use.
     """
     return dt.strftime(RFC_1123_DT_STR)
+
+
+def expires_from_cache_control(header, current_time):
+    """
+    Given a Cache-Control header, builds a Python datetime object corresponding
+    to the expiry time (in UTC). This function should respect all relevant
+    Cache-Control directives.
+
+    Takes current_time as an argument to ensure that 'max-age=0' generates the
+    correct behaviour without being special-cased.
+
+    Returns None to indicate that a request must not be cached.
+    """
+    # Cache control header values are made of multiple comma separated fields.
+    # Splitting them like this is probably a bad idea, but I'm going to roll with
+    # it for now. We'll come back to it.
+    fields = header.split(', ')
+    duration = None
+
+    for field in fields:
+        # Right now we don't handle no-cache applied to specific fields. To be
+        # as 'nice' as possible, treat any no-cache as applying to the whole
+        # request. Bail early, because there's no reason to stick around.
+        if field.startswith('no-cache') or field == 'no-store':
+            return None
+
+        if field.startswith('max-age'):
+            _, duration = field.split('=')
+            duration = int(duration)
+
+    interval = timedelta(seconds=int(duration))
+
+    return current_time + interval
