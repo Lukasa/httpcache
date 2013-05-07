@@ -1,8 +1,8 @@
-http-cache: HTTP Caching for Python
+httpcache: HTTP Caching for Python
 ===================================
 
 HTTP, like all well designed standards, has multiple confusing mechanisms for
-caching. This module is a HTTP cache that knows how to use HTTP headers and
+caching. httpcache is a HTTP cache that knows how to use HTTP headers and
 status codes to correctly cache your HTTP traffic. It's built for use with the
 excellent `Requests <https://github.com/kennethreitz/requests>`_ library,
 because if you're not using Requests you're probably prepared to roll your own
@@ -38,18 +38,18 @@ Features
 Installation
 ------------
 
-To install http-cache, you want to run:
+To install httpcache, you want to run:
 
 .. code-block:: bash
 
-    $ pip install http-cache
+    $ pip install httpcache
 
-If you can't do that, and you really must have http-cache, and you can't
+If you can't do that, and you really must have httpcache, and you can't
 install ``pip``, then you can try:
 
 .. code-block:: bash
 
-    $ easy_install http-cache
+    $ easy_install httpcache
 
 I strongly recommend you don't do that though.
 
@@ -68,4 +68,4 @@ contributing:
 #. Send a Pull Request. If I don't respond within a couple of days, please
    shout at me on Twitter or via email until I do something about it.
 
-.. _`Github repository`: https://lukasa.co.uk/
+.. _`Github repository`: https://github.com/Lukasa/httpcache
