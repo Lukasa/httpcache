@@ -119,11 +119,13 @@ class HTTPCache(object):
 
         cached_response = self._cache.get(url, None)
 
+        if cached_response is None:
+            return None
+
         # We want to move this cache entry either out of the cache (if it has
         # expired) or to the top of the cache queue (because we order by
         # freshness). Either way, we have to remove it from where it is now.
-        if cached_response:
-            del self._cache[url]
+        del self._cache[url]
 
         if cached_response['expiry'] is None:
             # We have no explicit expiry time, so we weren't instructed to
