@@ -134,6 +134,11 @@ class TestHTTPCache(object):
 class TestCachingHTTPAdapter(object):
     """
     Tests for the caching HTTP adapter.
+
+    NOTE: These tests currently use a fork of httpbin that has an additional
+    endpoint added to it. I have an open PR that adds this endpoint, but until
+    such time as it gets accepted these tests cannot be run unless you use the
+    same fork on your local machine. Obtain the fork from my GitHub account.
     """
     def test_we_respect_304(self):
         s = requests.Session()
