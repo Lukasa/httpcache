@@ -35,13 +35,12 @@ class CachingHTTPAdapter(HTTPAdapter):
         Builds a Response object from a urllib3 response. May involve returning
         a cached Response.
         """
-        status_code = getattr(response, 'status_code', None)
+        resp = super(CachingHTTPAdapter, self).build_response(request,
+                                                              response)
 
-        if status_code == 304:
-            resp = self.cache.handle_304(response)
+        if resp.status_code == 304:
+            resp = self.cache.handle_304(resp)
         else:
-            resp = super(CachingHTTPAdapter, self).build_response(request,
-                                                                  response)
             self.cache.store(resp)
 
         return resp
