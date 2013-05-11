@@ -16,7 +16,7 @@ if sys.argv[-1] == 'publish':
 
 packages = ['httpcache']
 
-requires = []
+requires = ['requests>=1.2.0']
 
 setup(
     name='httpcache',
