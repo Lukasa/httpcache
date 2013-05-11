@@ -32,6 +32,8 @@ def parse_date_header(header):
             dt = datetime.strptime(header, RFC_850_DT_STR)
         except ValueError:
             dt = None
+    except TypeError:
+        dt = None
 
     return dt
 
