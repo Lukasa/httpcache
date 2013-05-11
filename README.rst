@@ -8,7 +8,20 @@ excellent `Requests <https://github.com/kennethreitz/requests>`_ library,
 because if you're not using Requests you're probably prepared to roll your own
 caching library too.
 
-It's gloriously easy to use. Store your cache entries like this:
+It's gloriously easy to use. If all you want is caching in Requests, all you
+need to do is plug a transport adapter into your Requests session:
+
+.. code-block:: pycon
+
+    >>> import requests
+    >>> from httpcache import CachingHTTPAdapter
+    >>> s = requests.Session()
+    >>> s.mount('http://', CachingHTTPAdapter())
+
+Away you go!
+
+If you want more control, you can use the cache data-store itself. Store your
+cache entries like this:
 
 .. code-block:: python
 
