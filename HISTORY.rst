@@ -1,6 +1,11 @@
 History
 -------
 
+0.1.0 (2013-05-11)
+++++++++++++++++++
+
+* Provide a Requests Transport Adapter so that caching 'Just Works'.
+
 0.0.2 (2013-05-07)
 ++++++++++++++++++
 
