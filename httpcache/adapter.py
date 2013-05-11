@@ -8,6 +8,7 @@ cache contained in this module.
 from requests.adapters import HTTPAdapter
 from .cache import HTTPCache
 
+
 class CachingHTTPAdapter(HTTPAdapter):
     """
     A HTTP-caching-aware Transport Adapter for Python Requests.
@@ -22,11 +23,25 @@ class CachingHTTPAdapter(HTTPAdapter):
         Sends a PreparedRequest object, respecting RFC 2616's rules about HTTP
         caching. Returns a Response object that may have been cached.
         """
-        pass
+        cached_resp = self.cache.retrieve(request)
+
+        if cached_resp is not None:
+            return cached_resp
+        else:
+            return super(CachingHTTPAdapter, self).send(request, **kwargs)
 
     def build_response(self, request, response):
         """
         Builds a Response object from a urllib3 response. May involve returning
         a cached Response.
         """
-        pass
+        status_code = getattr(response, 'status_code', None)
+
+        if status_code == 304:
+            resp = self.cache.handle_304(response)
+        else:
+            resp = super(CachingHTTPAdapter, self).build_response(request,
+                                                                  response)
+            self.cache.store(resp)
+
+        return resp
