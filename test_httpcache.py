@@ -7,6 +7,7 @@ Test cases for httpcache.
 """
 import httpcache
 from datetime import datetime, timedelta
+import requests
 
 
 class TestHTTPCache(object):
@@ -128,6 +129,53 @@ class TestHTTPCache(object):
         cache = httpcache.HTTPCache()
 
         assert not cache.store(resp)
+
+
+class TestCachingHTTPAdapter(object):
+    """
+    Tests for the caching HTTP adapter.
+    """
+    def test_we_respect_304(self):
+        s = requests.Session()
+        s.mount('http://', httpcache.CachingHTTPAdapter())
+
+        r1 = s.get('http://127.0.0.1:5000/cache')
+        r2 = s.get('http://127.0.0.1:5000/cache')
+
+        assert r1 is r2
+
+    def test_we_respect_cache_control(self):
+        s = requests.Session()
+        s.mount('http://', httpcache.CachingHTTPAdapter())
+
+        r1 = s.get('http://127.0.0.1:5000/response-headers',
+                   params={'Cache-Control': 'max-age=3600'})
+        r2 = s.get('http://127.0.0.1:5000/response-headers',
+                   params={'Cache-Control': 'max-age=3600'})
+
+        assert r1 is r2
+
+    def test_we_respect_expires(self):
+        s = requests.Session()
+        s.mount('http://', httpcache.CachingHTTPAdapter())
+
+        r1 = s.get('http://127.0.0.1:5000/response-headers',
+                   params={'Expires': 'Sun, 06 Nov 2034 08:49:37 GMT'})
+        r2 = s.get('http://127.0.0.1:5000/response-headers',
+                   params={'Expires': 'Sun, 06 Nov 2034 08:49:37 GMT'})
+
+        assert r1 is r2
+
+    def test_we_respect_cache_control_2(self):
+        s = requests.Session()
+        s.mount('http://', httpcache.CachingHTTPAdapter())
+
+        r1 = s.get('http://127.0.0.1:5000/response-headers',
+                   params={'Cache-Control': 'no-cache'})
+        r2 = s.get('http://127.0.0.1:5000/response-headers',
+                   params={'Cache-Control': 'no-cache'})
+
+        assert r1 is not r2
 
 
 class MockRequestsResponse(object):
