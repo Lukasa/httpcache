@@ -17,6 +17,13 @@ from .utils import (parse_date_header, build_date_header,
 from datetime import datetime
 
 
+# RFC 2616 specifies that we can cache 200 OK, 203 Non Authoritative,
+# 206 Partial Content, 300 Multiple Choices, 301 Moved Permanently and
+# 410 Gone responses. We don't cache 206s at the moment because we
+# don't handle Range and Content-Range headers.
+CACHEABLE_RCS = (200, 203, 300, 301, 410)
+
+
 class HTTPCache(object):
     """
     The HTTP Cache object. Manages caching of responses according to RFC 2616,
@@ -51,8 +58,7 @@ class HTTPCache(object):
                 value = parse_date_header(date_header)
             return value
 
-        # To begin with we only cache 200 OK responses.
-        if response.status_code != 200:
+        if response.status_code not in CACHEABLE_RCS:
             return False
 
         url = response.url
