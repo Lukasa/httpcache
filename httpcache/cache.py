@@ -5,13 +5,7 @@ cache.py
 
 Contains the primary cache structure used in http-cache.
 """
-try:
-    from collections import OrderedDict
-except ImportError:
-    # We need to do something for earlier Python compatibility. Handle this
-    # later.
-    pass
-
+from .structures import RecentOrderedDict
 from .utils import (parse_date_header, build_date_header,
                     expires_from_cache_control)
 from datetime import datetime
@@ -41,7 +35,7 @@ class HTTPCache(object):
         #: (keyed off of 'response'), the retrieval or creation date (keyed off
         #: of 'creation') and the cache expiry date (keyed off of 'expiry').
         #: This last value may be None.
-        self._cache = OrderedDict()
+        self._cache = RecentOrderedDict()
 
     def store(self, response):
         """
@@ -88,13 +82,6 @@ class HTTPCache(object):
         if expiry is not None and expiry <= creation:
             return False
 
-        # Make sure that if we had an old cached version we move the new one to
-        # the top of the cache.
-        try:
-            del self._cache[url]
-        except KeyError:
-            pass
-
         self._cache[url] = {'response': response,
                             'creation': creation,
                             'expiry': expiry}
@@ -123,15 +110,10 @@ class HTTPCache(object):
         return_response = None
         url = request.url
 
-        cached_response = self._cache.get(url, None)
-
-        if cached_response is None:
+        try:
+            cached_response = self._cache[url]
+        except KeyError:
             return None
-
-        # We want to move this cache entry either out of the cache (if it has
-        # expired) or to the top of the cache queue (because we order by
-        # freshness). Either way, we have to remove it from where it is now.
-        del self._cache[url]
 
         if cached_response['expiry'] is None:
             # We have no explicit expiry time, so we weren't instructed to
@@ -139,7 +121,6 @@ class HTTPCache(object):
             creation = cached_response['creation']
             header = build_date_header(creation)
             request.headers['If-Modified-Since'] = header
-            self._cache[url] = cached_response
         else:
             # We have an explicit expiry time. If we're earlier than the expiry
             # time, return the response.
@@ -147,6 +128,7 @@ class HTTPCache(object):
 
             if now <= cached_response['expiry']:
                 return_response = cached_response['response']
-                self._cache[url] = cached_response
+            else:
+                del self._cache[url]
 
         return return_response

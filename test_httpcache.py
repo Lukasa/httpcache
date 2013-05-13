@@ -130,6 +130,32 @@ class TestHTTPCache(object):
 
         assert not cache.store(resp)
 
+    def test_cache_is_correctly_ordered(self):
+        resp1 = MockRequestsResponse()
+        resp2 = MockRequestsResponse()
+        resp2.url += 'abc'
+        resp3 = MockRequestsResponse()
+        resp3.url += 'def'
+        cache = httpcache.HTTPCache()
+        req = MockRequestsPreparedRequest()
+
+        cache.store(resp1)
+        cache.store(resp2)
+        cache.store(resp3)
+        cache.store(resp2)
+
+        cachelist = cache._cache.items()
+        assert cachelist[0][1]['response'] is resp1
+        assert cachelist[1][1]['response'] is resp3
+        assert cachelist[2][1]['response'] is resp2
+
+        cache.handle_304(req)
+
+        cachelist = cache._cache.items()
+        assert cachelist[0][1]['response'] is resp3
+        assert cachelist[1][1]['response'] is resp2
+        assert cachelist[2][1]['response'] is resp1
+
 
 class TestCachingHTTPAdapter(object):
     """
