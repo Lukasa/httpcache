@@ -7,7 +7,7 @@ Contains the primary cache structure used in http-cache.
 """
 from .structures import RecentOrderedDict
 from .utils import (parse_date_header, build_date_header,
-                    expires_from_cache_control)
+                    expires_from_cache_control, url_contains_query)
 from datetime import datetime
 
 
@@ -81,6 +81,12 @@ class HTTPCache(object):
         # cache the response at all.
         if expiry is not None and expiry <= creation:
             return False
+
+        # If there's a query portion of the url and it's a GET, don't cache
+        # this unless explicitly instructed to.
+        if expiry is None and response.request.method == 'GET':
+            if url_contains_query(url):
+                return False
 
         self._cache[url] = {'response': response,
                             'creation': creation,

@@ -156,6 +156,23 @@ class TestHTTPCache(object):
         assert cachelist[1][1]['response'] is resp2
         assert cachelist[2][1]['response'] is resp1
 
+    def test_do_not_cache_query_strings(self):
+        resp = MockRequestsResponse()
+        resp.url += '?a=b'
+        cache = httpcache.HTTPCache()
+
+        assert not cache.store(resp)
+
+    def test_cache_query_string_if_explicitly_asked(self):
+        resp = MockRequestsResponse(headers={'Cache-Control': 'max-age=3600'})
+        resp.url += '?a=b'
+        cache = httpcache.HTTPCache()
+
+        assert cache.store(resp)
+
+        cached_resp = cache.handle_304(resp)
+        assert cached_resp is resp
+
 
 class TestCachingHTTPAdapter(object):
     """
@@ -223,6 +240,7 @@ class MockRequestsResponse(object):
         self.headers = headers
         self.body = body
         self.url = url
+        self.request = MockRequestsPreparedRequest(url=self.url)
 
 
 class MockRequestsPreparedRequest(object):

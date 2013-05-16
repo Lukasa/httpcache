@@ -7,6 +7,11 @@ Utility functions for use with httpcache.
 """
 from datetime import datetime, timedelta
 
+try:  # Python 2
+    from urlparse import urlparse
+except ImportError:  # Python 3
+    from urllib.parse import urlparse
+
 RFC_1123_DT_STR = "%a, %d %b %Y %H:%M:%S GMT"
 RFC_850_DT_STR = "%A, %d-%b-%y %H:%M:%S GMT"
 
@@ -80,3 +85,14 @@ def expires_from_cache_control(header, current_time):
     interval = timedelta(seconds=int(duration))
 
     return current_time + interval
+
+
+def url_contains_query(url):
+    """
+    A very stupid function for determining if a URL contains a query string
+    or not.
+    """
+    if urlparse(url).query:
+        return True
+    else:
+        return False
