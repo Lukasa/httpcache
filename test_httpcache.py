@@ -173,6 +173,17 @@ class TestHTTPCache(object):
         cached_resp = cache.handle_304(resp)
         assert cached_resp is resp
 
+    def test_we_dont_cache_some_methods(self):
+        resp = MockRequestsResponse()
+        resp.request.method = 'POST'
+        cache = httpcache.HTTPCache()
+
+        methods = ('POST', 'PUT', 'DELETE', 'CONNECT', 'PATCH')
+
+        for method in methods:
+            resp.request.method = method
+            assert not cache.store(resp)
+
 
 class TestCachingHTTPAdapter(object):
     """

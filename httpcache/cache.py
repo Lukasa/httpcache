@@ -17,6 +17,9 @@ from datetime import datetime
 # don't handle Range and Content-Range headers.
 CACHEABLE_RCS = (200, 203, 300, 301, 410)
 
+# Cacheable verbs.
+CACHEABLE_VERBS = ('GET', 'HEAD', 'OPTIONS')
+
 
 class HTTPCache(object):
     """
@@ -53,6 +56,9 @@ class HTTPCache(object):
             return value
 
         if response.status_code not in CACHEABLE_RCS:
+            return False
+
+        if response.request.method not in CACHEABLE_VERBS:
             return False
 
         url = response.url
