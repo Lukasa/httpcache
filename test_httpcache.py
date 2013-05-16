@@ -175,7 +175,6 @@ class TestHTTPCache(object):
 
     def test_we_dont_cache_some_methods(self):
         resp = MockRequestsResponse()
-        resp.request.method = 'POST'
         cache = httpcache.HTTPCache()
 
         methods = ('POST', 'PUT', 'DELETE', 'CONNECT', 'PATCH')
@@ -183,6 +182,19 @@ class TestHTTPCache(object):
         for method in methods:
             resp.request.method = method
             assert not cache.store(resp)
+
+    def test_we_invalidate_for_some_methods(self):
+        resp = MockRequestsResponse()
+        cache = httpcache.HTTPCache()
+        req = MockRequestsPreparedRequest()
+
+        methods = ('POST', 'PUT', 'DELETE', 'CONNECT', 'PATCH')
+
+        for method in methods:
+            assert cache.store(resp)
+            req.method = method
+            assert cache.retrieve(req) is None
+            assert len(cache._cache) == 0
 
 
 class TestCachingHTTPAdapter(object):

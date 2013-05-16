@@ -20,6 +20,12 @@ CACHEABLE_RCS = (200, 203, 300, 301, 410)
 # Cacheable verbs.
 CACHEABLE_VERBS = ('GET', 'HEAD', 'OPTIONS')
 
+# Some verbs MUST invalidate the resource in the cache, according to RFC 2616.
+# If we send one of these, or any verb we don't recognise, invalidate the
+# cache entry for that URL. As it happens, these are also the cacheable
+# verbs. That works out well for us.
+NON_INVALIDATING_VERBS = CACHEABLE_VERBS
+
 
 class HTTPCache(object):
     """
@@ -125,6 +131,10 @@ class HTTPCache(object):
         try:
             cached_response = self._cache[url]
         except KeyError:
+            return None
+
+        if request.method not in NON_INVALIDATING_VERBS:
+            del self._cache[url]
             return None
 
         if cached_response['expiry'] is None:
