@@ -32,6 +32,12 @@ class HTTPCache(object):
     The HTTP Cache object. Manages caching of responses according to RFC 2616,
     adding necessary headers to HTTP request objects, and returning cached
     responses based on server responses.
+
+    This object is not expected to be used by most users. It is exposed as part
+    of the public API for users who feel the need for more control. This API
+    may change in a minor version increase. Be warned.
+
+    :param capacity: (Optional) The maximum capacity of the HTTP cache.
     """
     def __init__(self, capacity=50):
         #: The maximum capacity of the HTTP cache. When this many cache entries
@@ -49,7 +55,10 @@ class HTTPCache(object):
     def store(self, response):
         """
         Takes an HTTP response object and stores it in the cache according to
-        RFC 2616.
+        RFC 2616. Returns a boolean value indicating whether the response was
+        cached or not.
+
+        :param response: Requests :class:`Response <Response>` object to cache.
         """
         # Define an internal utility function.
         def date_header_or_default(header_name, default, response):
@@ -111,6 +120,10 @@ class HTTPCache(object):
         Given a 304 response, retrieves the cached entry. This unconditionally
         returns the cached entry, so it can be used when the 'intelligent'
         behaviour of retrieve() is not desired.
+
+        Returns None if there is no entry in the cache.
+
+        :param response: The 304 response to find the cached entry for. Should be a Requests :class:`Response <Response>`.
         """
         try:
             cached_response = self._cache[response.url]['response']
@@ -121,9 +134,14 @@ class HTTPCache(object):
 
     def retrieve(self, request):
         """
-        Retrieves a cached response if possible. If no cached response is
-        immediately available, but it may be possible to re-use an old one,
-        will attach an If-Modified-Since header to the request.
+        Retrieves a cached response if possible.
+
+        If there is a response that can be unconditionally returned (e.g. one
+        that had a Cache-Control header set), that response is returned. If
+        there is one that can be conditionally returned (if a 304 is returned),
+        applies an If-Modified-Since header to the request and returns None.
+
+        :param request: The Requests :class:`PreparedRequest <PreparedRequest>` object.
         """
         return_response = None
         url = request.url
