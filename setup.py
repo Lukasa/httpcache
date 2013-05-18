@@ -26,7 +26,7 @@ setup(
                      open('HISTORY.rst').read(),
     author='Cory Benfield',
     author_email='cory@lukasa.co.uk',
-    url='http://lukasa.co.uk/',
+    url='http://httpcache.readthedocs.org/en/latest/',
     packages=packages,
     package_data={'': ['LICENSE']},
     package_dir={'httpcache': 'httpcache'},
