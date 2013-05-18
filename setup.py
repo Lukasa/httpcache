@@ -2,12 +2,23 @@
 
 import os
 import sys
-import httpcache
 
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
+
+# Get the version
+import re
+version_regex = r'__version__ = ["\']([^"\']*)["\']'
+with open('httpcache/__init__.py', 'r') as f:
+    text = f.read()
+    match = re.search(version_regex, text)
+
+    if match:
+        version = match.group(1)
+    else:
+        raise RuntimeError("No version number found!")
 
 # Stealing this from Kenneth Reitz
 if sys.argv[-1] == 'publish':
@@ -20,7 +31,7 @@ requires = ['requests>=1.2.0']
 
 setup(
     name='httpcache',
-    version=httpcache.__version__,
+    version=version,
     description='Simple HTTP cache for Python Requests',
     long_description=open('README.rst').read() + '\n\n' +
                      open('HISTORY.rst').read(),

@@ -6,7 +6,7 @@ __init__.py
 Defines the public API to the httpcache module.
 """
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 from .cache import HTTPCache
 from .adapter import CachingHTTPAdapter
