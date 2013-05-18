@@ -196,6 +196,47 @@ class TestHTTPCache(object):
             assert cache.retrieve(req) is None
             assert len(cache._cache) == 0
 
+    def test_cache_has_fixed_capacity(self):
+        cache = httpcache.HTTPCache(capacity=5)
+
+        for i in range(10):
+            resp = MockRequestsResponse()
+            resp.url += str(i)
+            assert cache.store(resp)
+
+        assert len(cache._cache) == 5
+
+    def test_cache_preferentially_deletes_speculative_caching(self):
+        cache = httpcache.HTTPCache(capacity=5)
+
+        for i in range(4):
+            resp = MockRequestsResponse(headers={'Cache-Control': 'max-age=3600'})
+            resp.url += str(i)
+            assert cache.store(resp)
+
+        test_resp = MockRequestsResponse()
+        test_resp.url += 'other'
+        assert cache.store(test_resp)
+
+        resp = MockRequestsResponse(headers={'Cache-Control': 'max-age=3600'})
+        assert cache.store(resp)
+
+        assert len(cache._cache) == 5
+        assert test_resp not in [cache._cache[key] for key in cache._cache.keys()]
+
+    def test_cache_will_delete_expiry_caches_if_necessary(self):
+        cache = httpcache.HTTPCache(capacity=5)
+        test_resp = MockRequestsResponse(headers={'Cache-Control': 'max-age=3600'})
+        assert cache.store(test_resp)
+
+        for i in range(5):
+            resp = MockRequestsResponse(headers={'Cache-Control': 'max-age=3600'})
+            resp.url += str(i)
+            assert cache.store(resp)
+
+        assert len(cache._cache) == 5
+        assert test_resp not in [cache._cache[key] for key in cache._cache.keys()]
+
 
 class TestCachingHTTPAdapter(object):
     """

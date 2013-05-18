@@ -113,6 +113,8 @@ class HTTPCache(object):
                             'creation': creation,
                             'expiry': expiry}
 
+        self.__reduce_cache_count()
+
         return True
 
     def handle_304(self, response):
@@ -172,3 +174,34 @@ class HTTPCache(object):
                 del self._cache[url]
 
         return return_response
+
+    def __reduce_cache_count(self):
+        """
+        Drops the number of entries in the cache to the capacity of the cache.
+
+        Walks the backing RecentOrderedDict in order from oldest to youngest.
+        Deletes cache entries that are either invalid or being speculatively
+        cached until the number of cache entries drops to the capacity. If this
+        leaves the cache above capacity, begins deleting the least-used cache
+        entries that are still valid until the cache has space.
+        """
+        if len(self._cache) <= self.capacity:
+            return
+
+        to_delete = len(self._cache) - self.capacity
+        keys = self._cache.keys()
+
+        for key in keys:
+            if self._cache[key]['expiry'] is None:
+                del self._cache[key]
+                to_delete -= 1
+
+            if to_delete == 0:
+                return
+
+        keys = self._cache.keys()
+
+        for i in range(to_delete):
+            del self._cache[keys[i]]
+
+        return
