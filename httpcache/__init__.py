@@ -10,3 +10,5 @@ __version__ = '0.1.0'
 
 from .cache import HTTPCache
 from .adapter import CachingHTTPAdapter
+
+__all__ = [HTTPCache, CachingHTTPAdapter]
