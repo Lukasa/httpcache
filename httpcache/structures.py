@@ -4,12 +4,7 @@ structures.py
 
 Defines structures used by the httpcache module.
 """
-try:
-    from collections import OrderedDict, MutableMapping
-except ImportError:
-    # We need to do something for earlier Python compatibility. Handle this
-    # later.
-    pass
+from .compat import MutableMapping, OrderedDict
 
 
 class RecentOrderedDict(MutableMapping):
@@ -46,3 +41,6 @@ class RecentOrderedDict(MutableMapping):
 
     def items(self):
         return self._data.items()
+
+    def keys(self):
+        return self._data.keys()
