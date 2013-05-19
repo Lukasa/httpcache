@@ -66,6 +66,13 @@ install ``pip``, then you can try:
 
 I strongly recommend you don't do that though.
 
+Versions
+--------
+
+httpcache supports all the versions of Python that Requests does. This means
+2.6, 2.7 and 3.3. It is possible that httpcache will work on other versions of
+Python but we do not test on those versions and will not support them.
+
 Contribute
 ----------
 

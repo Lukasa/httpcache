@@ -40,6 +40,14 @@ means:
 Caching with Requests should be as easy as HTTP with Requests. Stop worrying
 about it. Just benefit from it.
 
+Versions
+--------
+
+httpcache supports all the versions of Python that Requests supports. We intend
+to do this indefinitely. Currently, this means we support 2.6, 2.7 and 3.3. It
+is possible that httpcache functions on earlier versions of Python, but such
+functionality is not supported and may be broken in any version change.
+
 Contents
 --------
 
