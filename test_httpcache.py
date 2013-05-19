@@ -144,14 +144,14 @@ class TestHTTPCache(object):
         cache.store(resp3)
         cache.store(resp2)
 
-        cachelist = cache._cache.items()
+        cachelist = list(cache._cache.items())
         assert cachelist[0][1]['response'] is resp1
         assert cachelist[1][1]['response'] is resp3
         assert cachelist[2][1]['response'] is resp2
 
         cache.handle_304(req)
 
-        cachelist = cache._cache.items()
+        cachelist = list(cache._cache.items())
         assert cachelist[0][1]['response'] is resp3
         assert cachelist[1][1]['response'] is resp2
         assert cachelist[2][1]['response'] is resp1
@@ -222,7 +222,7 @@ class TestHTTPCache(object):
         assert cache.store(resp)
 
         assert len(cache._cache) == 5
-        assert test_resp not in [cache._cache[key] for key in cache._cache.keys()]
+        assert test_resp not in [cache._cache[key] for key in list(cache._cache.keys())]
 
     def test_cache_will_delete_expiry_caches_if_necessary(self):
         cache = httpcache.HTTPCache(capacity=5)
@@ -235,7 +235,7 @@ class TestHTTPCache(object):
             assert cache.store(resp)
 
         assert len(cache._cache) == 5
-        assert test_resp not in [cache._cache[key] for key in cache._cache.keys()]
+        assert test_resp not in [cache._cache[key] for key in list(cache._cache.keys())]
 
 
 class TestCachingHTTPAdapter(object):

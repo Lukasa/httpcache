@@ -189,7 +189,7 @@ class HTTPCache(object):
             return
 
         to_delete = len(self._cache) - self.capacity
-        keys = self._cache.keys()
+        keys = list(self._cache.keys())
 
         for key in keys:
             if self._cache[key]['expiry'] is None:
@@ -199,7 +199,7 @@ class HTTPCache(object):
             if to_delete == 0:
                 return
 
-        keys = self._cache.keys()
+        keys = list(self._cache.keys())
 
         for i in range(to_delete):
             del self._cache[keys[i]]
