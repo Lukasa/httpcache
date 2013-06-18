@@ -37,6 +37,10 @@ And retrieve them like this:
 
 Simple.
 
+If this library doesn't float your boat, you can also take a look at the
+excellent `CacheControl <https://github.com/ionrock/cachecontrol>`_ library,
+which directly ports httplib2's caching algorithms.
+
 Features
 --------
 

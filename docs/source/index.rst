@@ -24,6 +24,10 @@ no muss, no fuss. Just plug in and go.
 Any request passed through that session will automatically use the HTTP cache.
 Guess what? Requests just got better.
 
+If this library doesn't float your boat, you can also take a look at the
+excellent `CacheControl <https://github.com/ionrock/cachecontrol>`_ library,
+which directly ports httplib2's caching algorithms.
+
 Features
 --------
 
