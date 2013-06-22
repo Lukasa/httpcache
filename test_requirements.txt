@@ -1,3 +1,4 @@
-py==1.4.13
-pytest==2.3.5
-wsgiref==0.1.2
+py
+pytest
+wsgiref
+requests
