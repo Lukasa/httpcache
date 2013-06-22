@@ -241,18 +241,13 @@ class TestHTTPCache(object):
 class TestCachingHTTPAdapter(object):
     """
     Tests for the caching HTTP adapter.
-
-    NOTE: These tests currently use a fork of httpbin that has an additional
-    endpoint added to it. I have an open PR that adds this endpoint, but until
-    such time as it gets accepted these tests cannot be run unless you use the
-    same fork on your local machine. Obtain the fork from my GitHub account.
     """
     def test_we_respect_304(self):
         s = requests.Session()
         s.mount('http://', httpcache.CachingHTTPAdapter())
 
-        r1 = s.get('http://127.0.0.1:5000/cache')
-        r2 = s.get('http://127.0.0.1:5000/cache')
+        r1 = s.get('http://httpbin.org/cache')
+        r2 = s.get('http://httpbin.org/cache')
 
         assert r1 is r2
 
@@ -260,9 +255,9 @@ class TestCachingHTTPAdapter(object):
         s = requests.Session()
         s.mount('http://', httpcache.CachingHTTPAdapter())
 
-        r1 = s.get('http://127.0.0.1:5000/response-headers',
+        r1 = s.get('http://httpbin.org/response-headers',
                    params={'Cache-Control': 'max-age=3600'})
-        r2 = s.get('http://127.0.0.1:5000/response-headers',
+        r2 = s.get('http://httpbin.org/response-headers',
                    params={'Cache-Control': 'max-age=3600'})
 
         assert r1 is r2
@@ -271,9 +266,9 @@ class TestCachingHTTPAdapter(object):
         s = requests.Session()
         s.mount('http://', httpcache.CachingHTTPAdapter())
 
-        r1 = s.get('http://127.0.0.1:5000/response-headers',
+        r1 = s.get('http://httpbin.org/response-headers',
                    params={'Expires': 'Sun, 06 Nov 2034 08:49:37 GMT'})
-        r2 = s.get('http://127.0.0.1:5000/response-headers',
+        r2 = s.get('http://httpbin.org/response-headers',
                    params={'Expires': 'Sun, 06 Nov 2034 08:49:37 GMT'})
 
         assert r1 is r2
@@ -282,9 +277,9 @@ class TestCachingHTTPAdapter(object):
         s = requests.Session()
         s.mount('http://', httpcache.CachingHTTPAdapter())
 
-        r1 = s.get('http://127.0.0.1:5000/response-headers',
+        r1 = s.get('http://httpbin.org/response-headers',
                    params={'Cache-Control': 'no-cache'})
-        r2 = s.get('http://127.0.0.1:5000/response-headers',
+        r2 = s.get('http://httpbin.org/response-headers',
                    params={'Cache-Control': 'no-cache'})
 
         assert r1 is not r2
