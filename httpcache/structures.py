@@ -4,43 +4,56 @@ structures.py
 
 Defines structures used by the httpcache module.
 """
-from .compat import MutableMapping, OrderedDict
 
-
-class RecentOrderedDict(MutableMapping):
+class RecentOrderedDict(dict):
     """
-    A custom variant of the OrderedDict that ensures that the object most
-    recently inserted or retrieved from the dictionary is at the top of the
-    dictionary enumeration.
+    A custom variant of the dictionary that ensures that the object most
+    recently inserted _or_ retrieved from the dictionary is enumerated first.
     """
-    def __init__(self, *args, **kwargs):
-        self._data = OrderedDict(*args, **kwargs)
+    def __init__(self):
+        self._data = {}
+        self._order = []
 
     def __setitem__(self, key, value):
         if key in self._data:
-            del self._data[key]
+            self._order.remove(key)
+
+        self._order.append(key)
         self._data[key] = value
 
     def __getitem__(self, key):
         value = self._data[key]
-        del self._data[key]
-        self._data[key] = value
+        self._order.remove(key)
+        self._order.append(key)
         return value
 
     def __delitem__(self, key):
         del self._data[key]
+        self._order.remove(key)
 
     def __iter__(self):
-        return iter(self._data)
+        return self._order
 
     def __len__(self):
-        return len(self._data)
+        return len(self._order)
 
     def __contains__(self, value):
         return self._data.__contains__(value)
 
     def items(self):
-        return self._data.items()
+        return [(key, self._data[key]) for key in self._order]
 
     def keys(self):
-        return self._data.keys()
+        return self._order
+
+    def values(self):
+        return [self._data[key] for key in self._order]
+
+    def clear(self):
+        self._data = {}
+        self._order = []
+
+    def copy(self):
+        c = RecentOrderedDict()
+        c._data = self._data.copy()
+        c._order = self._order[:]
