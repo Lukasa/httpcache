@@ -1,6 +1,11 @@
 httpcache: HTTP Caching for Python
 ===================================
 
+.. warning::
+   This library is no longer maintained: you should use the excellent
+   `CacheControl <https://github.com/ionrock/cachecontrol>`_ library, which
+   directly ports httplib2's caching algorithms.
+
 HTTP, like all well designed standards, has multiple confusing mechanisms for
 caching. httpcache is a HTTP cache that knows how to use HTTP headers and
 status codes to correctly cache your HTTP traffic. It's built for use with the
@@ -36,10 +41,6 @@ And retrieve them like this:
     cached_response = cache.retrieve(request)
 
 Simple.
-
-If this library doesn't float your boat, you can also take a look at the
-excellent `CacheControl <https://github.com/ionrock/cachecontrol>`_ library,
-which directly ports httplib2's caching algorithms.
 
 Features
 --------
