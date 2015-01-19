@@ -2,9 +2,9 @@ httpcache: HTTP Caching for Python
 ===================================
 
 .. warning::
-   This library is no longer maintained: you should use the excellent
-   `CacheControl <https://github.com/ionrock/cachecontrol>`_ library, which
-   directly ports httplib2's caching algorithms.
+   **This library is no longer maintained: you should use the excellent**
+   `CacheControl <https://github.com/ionrock/cachecontrol>`_ **library, which
+   directly ports httplib2's caching algorithms.**
 
 HTTP, like all well designed standards, has multiple confusing mechanisms for
 caching. httpcache is a HTTP cache that knows how to use HTTP headers and
